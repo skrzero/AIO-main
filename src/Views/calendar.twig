@@ -1,0 +1,123 @@
+{% extends 'layout.twig' %}
+
+{% block title %}Calendrier - AIO{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="mb-4">Calendrier</h1>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card shadow mb-4">
+            <div class="card-body">
+                <!-- En-tête du calendrier -->
+                <div class="calendar-header d-flex justify-content-between align-items-center mb-4">
+                    <button class="btn btn-sm btn-outline-primary" id="prev-month">
+                        &lt; Mois précédent
+                    </button>
+                    <h4 class="mb-0 text-center">
+                        <span id="month-year">{{ yearMonth|date('F Y') }}</span>
+                    </h4>
+                    <button class="btn btn-sm btn-outline-primary" id="next-month">
+                        Mois suivant &gt;
+                    </button>
+                </div>
+
+                <!-- Jours de la semaine -->
+                <div class="weekdays row text-center fw-bold mb-2">
+                    <div class="col border-end">Lun</div>
+                    <div class="col border-end">Mar</div>
+                    <div class="col border-end">Mer</div>
+                    <div class="col border-end">Jeu</div>
+                    <div class="col border-end">Ven</div>
+                    <div class="col border-end">Sam</div>
+                    <div class="col">Dim</div>
+                </div>
+
+                <!-- Grille du calendrier -->
+                <div class="days row" id="calendar-days">
+                    <!-- Les jours seront générés par JavaScript -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal pour créer/modifier un événement -->
+<div class="modal fade" id="eventModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="eventModalTitle">Nouvel événement</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="eventForm" method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                <input type="hidden" name="event_id" id="event_id">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="event-title" class="form-label">Titre *</label>
+                        <input type="text" class="form-control" id="event-title" name="title" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="event-description" class="form-label">Description</label>
+                        <textarea class="form-control" id="event-description" name="description" rows="3"></textarea>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="event-start" class="form-label">Début *</label>
+                            <input type="datetime-local" class="form-control" id="event-start" name="start_datetime" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="event-end" class="form-label">Fin *</label>
+                            <input type="datetime-local" class="form-control" id="event-end" name="end_datetime" required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="event-category" class="form-label">Catégorie</label>
+                        <select class="form-select" id="event-category" name="category">
+                            <option value="personnel">Personnel</option>
+                            <option value="travail">Travail</option>
+                            <option value="autre">Autre</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-primary">Enregistrer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal pour voir les événements d'un jour -->
+<div class="modal fade" id="dayEventsModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="dayEventsTitle">Événements du jour</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="dayEventsContent">
+                <p class="text-muted">Chargement...</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                <button type="button" class="btn btn-primary" id="add-event-btn">Ajouter un événement</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Données globales
+    const currentYearMonth = '{{ yearMonth }}';
+    const events = {{ events|json_encode|raw }};
+</script>
+<script src="/js/calendar.js"></script>
+{% endblock %}
+

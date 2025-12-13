@@ -1,0 +1,87 @@
+{% extends 'layout.twig' %}
+
+{% block title %}Tableau de bord - AIO{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="mb-4">Bienvenue, {{ user.email }} !</h1>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card shadow mb-4">
+            <div class="card-header">
+                <h3 class="mb-0">Mes messages</h3>
+            </div>
+            <div class="card-body">
+                <!-- Formulaire d'ajout de message -->
+                <form method="POST" action="/dashboard/message/add" class="mb-4">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                    <div class="input-group">
+                        <textarea class="form-control" 
+                                  name="content" 
+                                  placeholder="Écrivez votre message..." 
+                                  rows="3" 
+                                  required></textarea>
+                        <button class="btn btn-primary" type="submit">Ajouter</button>
+                    </div>
+                </form>
+
+                <!-- Liste des messages -->
+                {% if messages %}
+                    <div class="list-group">
+                        {% for message in messages %}
+                        <div class="list-group-item">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div class="flex-grow-1">
+                                    <p class="mb-1">{{ message.content }}</p>
+                                    <small class="text-muted">{{ message.created_at|date('d/m/Y à H:i') }}</small>
+                                </div>
+                                <form method="POST" action="/dashboard/message/delete" class="ms-2">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                                    <input type="hidden" name="message_id" value="{{ message.id }}">
+                                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce message ?')">Supprimer</button>
+                                </form>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-muted text-center">Aucun message pour le moment.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card shadow mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Informations</h5>
+            </div>
+            <div class="card-body">
+                <p><strong>Email:</strong> {{ user.email }}</p>
+                <p><strong>Membre depuis:</strong> {{ user.created_at|date('d/m/Y') }}</p>
+            </div>
+        </div>
+        
+        <div class="card shadow">
+            <div class="card-header">
+                <h5 class="mb-0">Navigation</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="/calendar" class="btn btn-primary">
+                        📅 Calendrier
+                    </a>
+                    <a href="/memos" class="btn btn-success">
+                        📝 Mémos
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

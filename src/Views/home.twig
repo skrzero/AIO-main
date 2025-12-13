@@ -1,0 +1,40 @@
+{% extends 'layout.twig' %}
+
+{% block title %}Accueil - AIO{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="mb-4">Bienvenue, {{ user.name }} !</h1>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6 mb-4">
+        <div class="card shadow">
+            <div class="card-body text-center">
+                <i class="fas fa-calendar-alt fa-3x text-primary mb-3"></i>
+                <h5 class="card-title">Calendrier</h5>
+                <p class="card-text">Gérez vos événements et rendez-vous</p>
+                <a href="/calendar" class="btn btn-primary">
+                    <i class="fas fa-arrow-right me-2"></i>Accéder au calendrier
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 mb-4">
+        <div class="card shadow">
+            <div class="card-body text-center">
+                <i class="fas fa-sticky-note fa-3x text-success mb-3"></i>
+                <h5 class="card-title">Mémos</h5>
+                <p class="card-text">Organisez vos notes et idées</p>
+                <a href="/memos" class="btn btn-success">
+                    <i class="fas fa-arrow-right me-2"></i>Accéder aux mémos
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

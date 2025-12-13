@@ -1,0 +1,12 @@
+@use 'elements/reset';
+@use 'elements/document';
+
+/** Variables **/
+@use 'settings/config.variables';
+
+/** Components **/
+@use 'components/sections';
+
+
+/** Page(s) **/
+@use 'pages/home';

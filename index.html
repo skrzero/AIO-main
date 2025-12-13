@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Interface Responsive</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <script src="js/Accueil.js" defer></script>
+</head>
+
+<body class="p-3">
+    <div class="page">
+        <!-- Top Menu -->
+        <div class="menu-bar mb-3">
+            <img id="menu-btn" src="https://img.icons8.com/ios-filled/50/ffffff/menu--v1.png" width="35" alt="Menu">
+            <input type="text" class="form-control search-bar mx-2" placeholder="Recherche">
+            <img src="https://img.icons8.com/ios-filled/50/ffffff/settings.png" width="35" alt="Paramètres">
+        </div>
+        <div id="sidebar" class="sidebar">
+            <span id="close-btn" class="close-btn">&times;</span>
+            <a href="index.html">Accueil</a>
+            <a href="agenda.html">Agenda</a>
+            <a href="bloc-note.html">Bloc-notes</a>
+            <a href="#">Messagerie</a>
+            <a href="#">Paramètres</a>
+        </div>
+        <div id="overlay" class="overlay" aria-hidden="true"></div>
+
+        <!-- Weather Widget -->
+        <div id="weather" class="weather-card">
+            <div class="weather-loader">
+                <div class="loader-spinner"></div>
+                <p>Chargement de la météo...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Events -->
+    <div class="body_app">
+        <div class="notif">
+            <div class="notif -blue">
+                <div class="notif_content">
+                    <div class="notif_content_date">
+                        <span class="date">30/12</span>
+                        <span class="year">2025</span>
+                    </div>
+                    <div class="notif_content_title">
+                        Rendez-vous garage pour changer les pneus ...
+                    </div>
+                    <div class="notif_content_action">
+                        <img src="images/chevron-right.png" alt="">
+                    </div>
+                </div>
+            </div>
+            <div class="notif -purple">
+                <div class="notif_content">
+                    <div class="notif_content_date">
+                        <span class="date">16/04</span>
+                        <span class="year">2025</span>
+                    </div>
+                    <div class="notif_content_title">
+                        Rendez-vous docteur
+                    </div>
+                    <div class="notif_content_action">
+                        <img src="images/chevron-right.png" alt="">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="btn_bleu">
+            <a class="btn_bleu_text" href="agenda.html">Tout voir</a>
+        </div>
+
+        <!-- Timer -->
+        <div class="text-center">
+            <p class="text-uppercase">Minuteur</p>
+            <div class="minuteur">00:00:00</div>
+            <button class="btn btn-start">Demarrer</button>
+        </div>
+
+        <!-- Bottom Icons -->
+        <div class="bottom-icons">
+            <div class="icon-box">
+                <img src="images/memo-removebg-preview.png" alt="Edit">
+                <img src="images/mail-removebg-preview.png" alt="Email">
+            </div>
+        </div>
+    </div>
+    <script src="./js/Timer.js" defer></script>
+</body>
+
+</html>

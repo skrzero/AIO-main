@@ -1,0 +1,62 @@
+/*!************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[1].use[2]!./node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[1].use[3]!./assets/styles/base.scss ***!
+  \************************************************************************************************************************************************************************************************************************************************/
+@layer reset {
+  *, *:before, *:after {
+    box-sizing: border-box;
+  }
+  html, body, div, span, object, iframe, figure, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, code, em, img, small, strike, strong, sub, sup, tt, b, u, i, ol, ul, li, fieldset, form, label, table, caption, tbody, tfoot, thead, tr, th, td, main, canvas, embed, footer, header, nav, section, video {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    font-size: 100%;
+    font: inherit;
+    vertical-align: baseline;
+    text-size-adjust: none;
+  }
+  footer, header, nav, section, main {
+    display: block;
+  }
+  body {
+    line-height: 1;
+  }
+  ol, ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  blockquote, q {
+    quotes: none;
+  }
+  blockquote:before, blockquote:after, q:before, q:after {
+    content: "";
+    content: none;
+  }
+  table {
+    border-collapse: collapse;
+    border-spacing: 0;
+  }
+  input {
+    -webkit-appearance: none;
+    border-radius: 0;
+  }
+}
+body {
+  background: var(--primary-color);
+  color: #fff;
+  background-color: red;
+}
+
+/** Variables **/
+:root {
+  --primary-color: #e0e9ff;
+}
+
+/** Components **/
+.c-section {
+  margin-bottom: 50px;
+  padding-bottom: 50px;
+  border-bottom: 1px solid #dadada;
+}
+
+/** Page(s) **/

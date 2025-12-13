@@ -1,0 +1,105 @@
+{% extends 'layout.twig' %}
+
+{% block title %}Mémos - AIO{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="mb-4">Mémos</h1>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-4 mb-4">
+        <div class="card shadow">
+            <div class="card-header">
+                <h5 class="mb-0">Nouveau mémo</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="/memos/create">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                    <div class="mb-3">
+                        <label for="memo-title" class="form-label">Titre *</label>
+                        <input type="text" class="form-control" id="memo-title" name="title" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="memo-content" class="form-label">Contenu</label>
+                        <textarea class="form-control" id="memo-content" name="content" rows="5"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Créer le mémo</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-8">
+        <div class="memo-container" id="memo-container">
+            {% if memos %}
+                {% for memo in memos %}
+                <div class="card memo-card mb-3 shadow-sm" draggable="true" data-id="{{ memo.id }}">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <h5 class="card-title mb-0">{{ memo.title }}</h5>
+                            <div class="btn-group btn-group-sm">
+                                <button class="btn btn-outline-warning edit-memo" data-id="{{ memo.id }}" data-title="{{ memo.title }}" data-content="{{ memo.content|e }}">
+                                    ✏️
+                                </button>
+                                <form method="POST" action="/memos/delete" class="d-inline" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce mémo ?');">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                                    <input type="hidden" name="memo_id" value="{{ memo.id }}">
+                                    <button type="submit" class="btn btn-outline-danger">🗑️</button>
+                                </form>
+                            </div>
+                        </div>
+                        {% if memo.content %}
+                        <p class="card-text">{{ memo.content|nl2br }}</p>
+                        {% endif %}
+                        <small class="text-muted">Créé le {{ memo.created_at|date('d/m/Y à H:i') }}</small>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <p class="text-muted text-center">Aucun mémo pour le moment. Créez-en un !</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Modal pour éditer un mémo -->
+<div class="modal fade" id="editMemoModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Modifier le mémo</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" action="/memos/update">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                <input type="hidden" name="memo_id" id="edit-memo-id">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="edit-memo-title" class="form-label">Titre *</label>
+                        <input type="text" class="form-control" id="edit-memo-title" name="title" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit-memo-content" class="form-label">Contenu</label>
+                        <textarea class="form-control" id="edit-memo-content" name="content" rows="5"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-primary">Enregistrer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+<script>
+    const csrfToken = '{{ csrf_token }}';
+    const memos = {{ memos|json_encode|raw }};
+</script>
+<script src="/js/memos.js"></script>
+{% endblock %}
+

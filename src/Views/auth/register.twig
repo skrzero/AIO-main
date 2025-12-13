@@ -1,0 +1,98 @@
+{% extends 'layout.twig' %}
+
+{% block title %}Inscription - AIO{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="/css/auth.css">
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5" style="max-width: 400px;">
+    <div class="card shadow-sm">
+        <div class="card-body p-4">
+            <h2 class="card-title text-center mb-4">
+                <i class="fas fa-user-plus me-2"></i>Inscription
+            </h2>
+            
+            {% if error %}
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-circle me-2"></i>{{ error }}
+                </div>
+            {% endif %}
+
+            <form action="/register" method="POST" id="registerForm">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                
+                <div class="mb-3">
+                    <label for="name" class="form-label">
+                        <i class="fas fa-user me-1"></i>Nom
+                    </label>
+                    <input type="text" 
+                           class="form-control" 
+                           id="name" 
+                           name="name" 
+                           placeholder="Votre nom" 
+                           required 
+                           autofocus>
+                    <div class="invalid-feedback"></div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="email" class="form-label">
+                        <i class="fas fa-envelope me-1"></i>Email
+                    </label>
+                    <input type="email" 
+                           class="form-control" 
+                           id="email" 
+                           name="email" 
+                           placeholder="votre@email.com" 
+                           required>
+                    <div class="invalid-feedback"></div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="password" class="form-label">
+                        <i class="fas fa-lock me-1"></i>Mot de passe
+                    </label>
+                    <input type="password" 
+                           class="form-control" 
+                           id="password" 
+                           name="password" 
+                           placeholder="Minimum 8 caractères" 
+                           required 
+                           minlength="8">
+                    <small class="form-text text-muted">Le mot de passe doit contenir au moins 8 caractères</small>
+                    <div class="invalid-feedback"></div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="password_confirm" class="form-label">
+                        <i class="fas fa-lock me-1"></i>Confirmer le mot de passe
+                    </label>
+                    <input type="password" 
+                           class="form-control" 
+                           id="password_confirm" 
+                           name="password_confirm" 
+                           placeholder="Confirmez votre mot de passe" 
+                           required>
+                    <div class="invalid-feedback"></div>
+                </div>
+                
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-user-plus me-2"></i>S'inscrire
+                    </button>
+                </div>
+            </form>
+            
+            <div class="mt-3 text-center">
+                <a href="/login" class="text-decoration-none">
+                    <i class="fas fa-sign-in-alt me-1"></i>Déjà un compte ? Se connecter
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/js/auth.js"></script>
+{% endblock %}

@@ -1,0 +1,25 @@
+# Composer
+/vendor/
+composer.lock
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Cache Twig (en production)
+cache/
+
+# Fichiers sensibles
+.env
+.env.local

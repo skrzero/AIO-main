@@ -1,0 +1,19 @@
+# Configuration Apache pour le routing
+RewriteEngine On
+
+# Redirige toutes les requêtes vers index.php sauf les fichiers existants
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ index.php [QSA,L]
+
+# Sécurité : Empêche l'accès direct aux fichiers sensibles
+<FilesMatch "^(composer\.(json|lock)|\.env|\.git)">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# Active les sessions sécurisées
+php_value session.cookie_httponly 1
+php_value session.cookie_secure 0
+php_value session.use_strict_mode 1
+
