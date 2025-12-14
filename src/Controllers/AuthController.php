@@ -18,6 +18,27 @@ class AuthController extends BaseController
     }
 
     /**
+     * Affiche la page avec onglets (Connexion / Inscription)
+     */
+    public function showAuthTabs(): void
+    {
+        // Si déjà connecté, redirige vers home
+        if (isset($_SESSION['user_id'])) {
+            $this->redirect('/home');
+            return;
+        }
+
+        $csrfToken = $this->generateCsrfToken();
+        $this->render('auth/auth-tabs.twig', [
+            'csrf_token' => $csrfToken,
+            'error' => $_SESSION['error'] ?? null,
+            'success' => $_SESSION['success'] ?? null
+        ]);
+
+        unset($_SESSION['error'], $_SESSION['success']);
+    }
+
+    /**
      * Affiche le formulaire de connexion
      */
     public function showLogin(): void
@@ -51,7 +72,7 @@ class AuthController extends BaseController
         // Vérification CSRF
         if (!isset($_POST['csrf_token']) || !$this->verifyCsrfToken($_POST['csrf_token'])) {
             $_SESSION['error'] = "Token CSRF invalide";
-            $this->redirect('/login');
+            $this->redirect('/auth');
             return;
         }
 
@@ -61,7 +82,7 @@ class AuthController extends BaseController
 
         if (!$email || empty($password)) {
             $_SESSION['error'] = "Email ou mot de passe invalide";
-            $this->redirect('/login');
+            $this->redirect('/auth');
             return;
         }
 
@@ -84,12 +105,12 @@ class AuthController extends BaseController
                 $this->redirect('/home');
             } else {
                 $_SESSION['error'] = "Email ou mot de passe incorrect";
-                $this->redirect('/login');
+                $this->redirect('/auth');
             }
         } catch (\RuntimeException $e) {
             error_log("Erreur lors de la connexion: " . $e->getMessage());
             $_SESSION['error'] = "Une erreur est survenue. Réessayez plus tard.";
-            $this->redirect('/login');
+            $this->redirect('/auth');
         }
     }
 
@@ -127,7 +148,7 @@ class AuthController extends BaseController
         // Vérification CSRF
         if (!isset($_POST['csrf_token']) || !$this->verifyCsrfToken($_POST['csrf_token'])) {
             $_SESSION['error'] = "Token CSRF invalide";
-            $this->redirect('/register');
+            $this->redirect('/auth');
             return;
         }
 
@@ -139,25 +160,25 @@ class AuthController extends BaseController
 
         if (empty($name)) {
             $_SESSION['error'] = "Le nom est obligatoire";
-            $this->redirect('/register');
+            $this->redirect('/auth');
             return;
         }
 
         if (!$email) {
             $_SESSION['error'] = "Email invalide";
-            $this->redirect('/register');
+            $this->redirect('/auth');
             return;
         }
 
         if (strlen($password) < 8) {
             $_SESSION['error'] = "Le mot de passe doit contenir au moins 8 caractères";
-            $this->redirect('/register');
+            $this->redirect('/auth');
             return;
         }
 
         if ($password !== $passwordConfirm) {
             $_SESSION['error'] = "Les mots de passe ne correspondent pas";
-            $this->redirect('/register');
+            $this->redirect('/auth');
             return;
         }
 
@@ -170,14 +191,15 @@ class AuthController extends BaseController
 
             if ($success) {
                 $_SESSION['success'] = "Inscription réussie ! Vous pouvez maintenant vous connecter.";
-                $this->redirect('/login');
+                // Redirige vers l'onglet connexion après inscription
+                $this->redirect('/auth');
             } else {
                 $_SESSION['error'] = "Erreur lors de l'inscription";
-                $this->redirect('/register');
+                $this->redirect('/auth');
             }
         } catch (\RuntimeException $e) {
             $_SESSION['error'] = $e->getMessage();
-            $this->redirect('/register');
+            $this->redirect('/auth');
         }
     }
 
@@ -206,6 +228,222 @@ class AuthController extends BaseController
         }
         session_destroy();
 
-        $this->redirect('/login');
+        $this->redirect('/auth');
+    }
+
+    /**
+     * Affiche le formulaire de demande de réinitialisation de mot de passe
+     */
+    public function showForgotPassword(): void
+    {
+        // Si déjà connecté, redirige vers home
+        if (isset($_SESSION['user_id'])) {
+            $this->redirect('/home');
+            return;
+        }
+
+        $csrfToken = $this->generateCsrfToken();
+        $this->render('auth/forgot-password.twig', [
+            'csrf_token' => $csrfToken,
+            'error' => $_SESSION['error'] ?? null,
+            'success' => $_SESSION['success'] ?? null
+        ]);
+
+        unset($_SESSION['error'], $_SESSION['success']);
+    }
+
+    /**
+     * Traite la demande de réinitialisation de mot de passe
+     */
+    public function forgotPassword(): void
+    {
+        // Si déjà connecté, redirige vers home
+        if (isset($_SESSION['user_id'])) {
+            $this->redirect('/home');
+            return;
+        }
+
+        // Vérification CSRF
+        if (!isset($_POST['csrf_token']) || !$this->verifyCsrfToken($_POST['csrf_token'])) {
+            $_SESSION['error'] = "Token CSRF invalide";
+            $this->redirect('/forgot-password');
+            return;
+        }
+
+        $email = filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL);
+
+        if (!$email) {
+            $_SESSION['error'] = "Email invalide";
+            $this->redirect('/forgot-password');
+            return;
+        }
+
+        try {
+            $user = $this->userModel->findByEmail($email);
+
+            if ($user) {
+                // Génère un token de réinitialisation
+                $token = bin2hex(random_bytes(32));
+                $expiresAt = date('Y-m-d H:i:s', time() + 3600); // 1 heure
+
+                // Stocke le token en base de données
+                $stmt = $this->pdo->prepare(
+                    "INSERT INTO password_resets (email, token, expires_at) 
+                     VALUES (:email, :token, :expires_at)
+                     ON DUPLICATE KEY UPDATE token = :token, expires_at = :expires_at, created_at = NOW()"
+                );
+                $stmt->execute([
+                    'email' => $email,
+                    'token' => $token,
+                    'expires_at' => $expiresAt
+                ]);
+
+                // En production, vous enverriez un email ici
+                // Pour le développement, on affiche le lien dans un message
+                $resetLink = $_SERVER['HTTP_HOST'] . '/reset-password?token=' . $token;
+                
+                $_SESSION['success'] = "Un lien de réinitialisation a été généré. En production, il serait envoyé par email. Lien de test : " . $resetLink;
+            } else {
+                // Pour la sécurité, on affiche le même message même si l'email n'existe pas
+                $_SESSION['success'] = "Si cet email existe, un lien de réinitialisation vous a été envoyé.";
+            }
+
+            $this->redirect('/forgot-password');
+        } catch (\RuntimeException $e) {
+            error_log("Erreur lors de la demande de réinitialisation: " . $e->getMessage());
+            $_SESSION['error'] = "Une erreur est survenue. Réessayez plus tard.";
+            $this->redirect('/forgot-password');
+        }
+    }
+
+    /**
+     * Affiche le formulaire de réinitialisation de mot de passe
+     */
+    public function showResetPassword(): void
+    {
+        // Si déjà connecté, redirige vers home
+        if (isset($_SESSION['user_id'])) {
+            $this->redirect('/home');
+            return;
+        }
+
+        $token = $_GET['token'] ?? '';
+
+        if (empty($token)) {
+            $_SESSION['error'] = "Token invalide ou manquant";
+            $this->redirect('/forgot-password');
+            return;
+        }
+
+        // Vérifie si le token est valide
+        try {
+            $stmt = $this->pdo->prepare(
+                "SELECT * FROM password_resets 
+                 WHERE token = :token 
+                 AND expires_at > NOW() 
+                 LIMIT 1"
+            );
+            $stmt->execute(['token' => $token]);
+            $reset = $stmt->fetch();
+
+            if (!$reset) {
+                $_SESSION['error'] = "Token invalide ou expiré";
+                $this->redirect('/forgot-password');
+                return;
+            }
+
+            $csrfToken = $this->generateCsrfToken();
+            $this->render('auth/reset-password.twig', [
+                'csrf_token' => $csrfToken,
+                'token' => $token,
+                'error' => $_SESSION['error'] ?? null
+            ]);
+
+            unset($_SESSION['error']);
+        } catch (\RuntimeException $e) {
+            error_log("Erreur lors de la vérification du token: " . $e->getMessage());
+            $_SESSION['error'] = "Une erreur est survenue. Réessayez plus tard.";
+            $this->redirect('/forgot-password');
+        }
+    }
+
+    /**
+     * Traite la réinitialisation du mot de passe
+     */
+    public function resetPassword(): void
+    {
+        // Si déjà connecté, redirige vers home
+        if (isset($_SESSION['user_id'])) {
+            $this->redirect('/home');
+            return;
+        }
+
+        // Vérification CSRF
+        if (!isset($_POST['csrf_token']) || !$this->verifyCsrfToken($_POST['csrf_token'])) {
+            $_SESSION['error'] = "Token CSRF invalide";
+            $this->redirect('/forgot-password');
+            return;
+        }
+
+        $token = $_POST['token'] ?? '';
+        $password = $_POST['password'] ?? '';
+        $passwordConfirm = $_POST['password_confirm'] ?? '';
+
+        if (empty($token)) {
+            $_SESSION['error'] = "Token invalide";
+            $this->redirect('/forgot-password');
+            return;
+        }
+
+        if (strlen($password) < 8) {
+            $_SESSION['error'] = "Le mot de passe doit contenir au moins 8 caractères";
+            $this->redirect('/reset-password?token=' . $token);
+            return;
+        }
+
+        if ($password !== $passwordConfirm) {
+            $_SESSION['error'] = "Les mots de passe ne correspondent pas";
+            $this->redirect('/reset-password?token=' . $token);
+            return;
+        }
+
+        try {
+            // Vérifie le token
+            $stmt = $this->pdo->prepare(
+                "SELECT * FROM password_resets 
+                 WHERE token = :token 
+                 AND expires_at > NOW() 
+                 LIMIT 1"
+            );
+            $stmt->execute(['token' => $token]);
+            $reset = $stmt->fetch();
+
+            if (!$reset) {
+                $_SESSION['error'] = "Token invalide ou expiré";
+                $this->redirect('/forgot-password');
+                return;
+            }
+
+            // Met à jour le mot de passe
+            $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+            $stmt = $this->pdo->prepare(
+                "UPDATE users SET password = :password WHERE email = :email"
+            );
+            $stmt->execute([
+                'password' => $hashedPassword,
+                'email' => $reset['email']
+            ]);
+
+            // Supprime le token utilisé
+            $stmt = $this->pdo->prepare("DELETE FROM password_resets WHERE token = :token");
+            $stmt->execute(['token' => $token]);
+
+            $_SESSION['success'] = "Votre mot de passe a été réinitialisé avec succès. Vous pouvez maintenant vous connecter.";
+            $this->redirect('/auth');
+        } catch (\RuntimeException $e) {
+            error_log("Erreur lors de la réinitialisation: " . $e->getMessage());
+            $_SESSION['error'] = "Une erreur est survenue. Réessayez plus tard.";
+            $this->redirect('/reset-password?token=' . $token);
+        }
     }
 }

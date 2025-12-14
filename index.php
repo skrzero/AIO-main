@@ -22,17 +22,17 @@ $requestMethod = $_SERVER['REQUEST_METHOD'];
 
 try {
     // Routes publiques (pas de protection)
-    $publicRoutes = ['/login', '/register'];
+    $publicRoutes = ['/auth', '/login', '/register', '/forgot-password', '/reset-password'];
     
     // Routes protégées (nécessitent une authentification)
     $protectedRoutes = ['/home', '/dashboard', '/calendar', '/memos'];
 
-    // Route: Page d'accueil -> redirige vers login ou home
+    // Route: Page d'accueil -> redirige vers auth ou home
     if ($requestUri === '/' || $requestUri === '/index.php') {
         if (isset($_SESSION['user_id'])) {
             header('Location: /home');
         } else {
-            header('Location: /login');
+            header('Location: /auth');
         }
         exit;
     }
@@ -51,9 +51,15 @@ try {
         \App\Middleware\AuthMiddleware::check();
     }
 
-    // Route: Login (GET)
+    // Route: Espace de connexion avec onglets (GET)
+    if ($requestUri === '/auth' && $requestMethod === 'GET') {
+        (new \App\Controllers\AuthController())->showAuthTabs();
+        exit;
+    }
+
+    // Route: Login (GET) - Redirige vers /auth
     if ($requestUri === '/login' && $requestMethod === 'GET') {
-        (new \App\Controllers\AuthController())->showLogin();
+        header('Location: /auth');
         exit;
     }
 
@@ -63,9 +69,9 @@ try {
         exit;
     }
 
-    // Route: Register (GET)
+    // Route: Register (GET) - Redirige vers /auth
     if ($requestUri === '/register' && $requestMethod === 'GET') {
-        (new \App\Controllers\AuthController())->showRegister();
+        header('Location: /auth');
         exit;
     }
 
@@ -84,6 +90,30 @@ try {
     // Route: Logout
     if ($requestUri === '/logout') {
         (new \App\Controllers\AuthController())->logout();
+        exit;
+    }
+
+    // Route: Mot de passe oublié (GET)
+    if ($requestUri === '/forgot-password' && $requestMethod === 'GET') {
+        (new \App\Controllers\AuthController())->showForgotPassword();
+        exit;
+    }
+
+    // Route: Mot de passe oublié (POST)
+    if ($requestUri === '/forgot-password' && $requestMethod === 'POST') {
+        (new \App\Controllers\AuthController())->forgotPassword();
+        exit;
+    }
+
+    // Route: Réinitialisation de mot de passe (GET)
+    if ($requestUri === '/reset-password' && $requestMethod === 'GET') {
+        (new \App\Controllers\AuthController())->showResetPassword();
+        exit;
+    }
+
+    // Route: Réinitialisation de mot de passe (POST)
+    if ($requestUri === '/reset-password' && $requestMethod === 'POST') {
+        (new \App\Controllers\AuthController())->resetPassword();
         exit;
     }
 

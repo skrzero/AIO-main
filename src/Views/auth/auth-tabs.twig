@@ -1,0 +1,371 @@
+{% extends 'layout.twig' %}
+
+{% block title %}Connexion / Inscription - AIO{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="/css/auth.css">
+<style>
+    .auth-tabs-container {
+        max-width: 500px;
+        margin: 0 auto;
+    }
+    
+    .nav-tabs {
+        border-bottom: 2px solid #dee2e6;
+        margin-bottom: 2rem;
+    }
+    
+    .nav-tabs .nav-link {
+        color: #6c757d;
+        border: none;
+        border-bottom: 3px solid transparent;
+        padding: 1rem 2rem;
+        transition: all 0.3s ease;
+    }
+    
+    .nav-tabs .nav-link:hover {
+        border-color: transparent;
+        color: #0d6efd;
+        background-color: rgba(13, 110, 253, 0.05);
+    }
+    
+    .nav-tabs .nav-link.active {
+        color: #0d6efd;
+        background-color: transparent;
+        border-color: transparent;
+        border-bottom-color: #0d6efd;
+        font-weight: 600;
+    }
+    
+    .tab-content {
+        min-height: 400px;
+    }
+    
+    .tab-pane {
+        animation: fadeIn 0.3s ease;
+    }
+    
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="auth-tabs-container">
+        <div class="card shadow-lg">
+            <div class="card-body p-4">
+                <h2 class="card-title text-center mb-4">
+                    <i class="fas fa-user-circle me-2"></i>Espace de connexion
+                </h2>
+                
+                <!-- Onglets Bootstrap -->
+                <ul class="nav nav-tabs nav-justified" id="authTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" 
+                                id="login-tab" 
+                                data-bs-toggle="tab" 
+                                data-bs-target="#login" 
+                                type="button" 
+                                role="tab" 
+                                aria-controls="login" 
+                                aria-selected="true">
+                            <i class="fas fa-sign-in-alt me-2"></i>Connexion
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" 
+                                id="register-tab" 
+                                data-bs-toggle="tab" 
+                                data-bs-target="#register" 
+                                type="button" 
+                                role="tab" 
+                                aria-controls="register" 
+                                aria-selected="false">
+                            <i class="fas fa-user-plus me-2"></i>Inscription
+                        </button>
+                    </li>
+                </ul>
+                
+                <!-- Contenu des onglets -->
+                <div class="tab-content mt-4" id="authTabsContent">
+                    <!-- Onglet Connexion -->
+                    <div class="tab-pane fade show active" 
+                         id="login" 
+                         role="tabpanel" 
+                         aria-labelledby="login-tab">
+                        {% if error and not success %}
+                            <div class="alert alert-danger">
+                                <i class="fas fa-exclamation-circle me-2"></i>{{ error }}
+                            </div>
+                        {% endif %}
+                        
+                        <form action="/login" method="POST" id="loginForm">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                            
+                            <div class="mb-3">
+                                <label for="login-email" class="form-label">
+                                    <i class="fas fa-envelope me-1"></i>Email
+                                </label>
+                                <input type="email" 
+                                       class="form-control" 
+                                       id="login-email" 
+                                       name="email" 
+                                       placeholder="votre@email.com" 
+                                       required 
+                                       autofocus>
+                                <div class="invalid-feedback"></div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="login-password" class="form-label">
+                                    <i class="fas fa-lock me-1"></i>Mot de passe
+                                </label>
+                                <input type="password" 
+                                       class="form-control" 
+                                       id="login-password" 
+                                       name="password" 
+                                       placeholder="Mot de passe" 
+                                       required>
+                                <div class="invalid-feedback"></div>
+                            </div>
+                            
+                            <div class="mb-3 form-check">
+                                <input type="checkbox" class="form-check-input" id="rememberMe" name="remember_me">
+                                <label class="form-check-label" for="rememberMe">
+                                    Se souvenir de moi
+                                </label>
+                            </div>
+                            
+                            <div class="d-grid gap-2 mb-3">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-sign-in-alt me-2"></i>Se connecter
+                                </button>
+                            </div>
+                            
+                            <div class="text-center">
+                                <a href="/forgot-password" class="text-decoration-none text-muted small">
+                                    <i class="fas fa-key me-1"></i>Mot de passe oublié ?
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                    
+                    <!-- Onglet Inscription -->
+                    <div class="tab-pane fade" 
+                         id="register" 
+                         role="tabpanel" 
+                         aria-labelledby="register-tab">
+                        {% if error and success is not defined %}
+                            <div class="alert alert-danger">
+                                <i class="fas fa-exclamation-circle me-2"></i>{{ error }}
+                            </div>
+                        {% endif %}
+                        
+                        <form action="/register" method="POST" id="registerForm">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                            
+                            <div class="mb-3">
+                                <label for="register-name" class="form-label">
+                                    <i class="fas fa-user me-1"></i>Nom
+                                </label>
+                                <input type="text" 
+                                       class="form-control" 
+                                       id="register-name" 
+                                       name="name" 
+                                       placeholder="Votre nom" 
+                                       required>
+                                <div class="invalid-feedback"></div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="register-email" class="form-label">
+                                    <i class="fas fa-envelope me-1"></i>Email
+                                </label>
+                                <input type="email" 
+                                       class="form-control" 
+                                       id="register-email" 
+                                       name="email" 
+                                       placeholder="votre@email.com" 
+                                       required>
+                                <div class="invalid-feedback"></div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="register-password" class="form-label">
+                                    <i class="fas fa-lock me-1"></i>Mot de passe
+                                </label>
+                                <input type="password" 
+                                       class="form-control" 
+                                       id="register-password" 
+                                       name="password" 
+                                       placeholder="Minimum 8 caractères" 
+                                       required 
+                                       minlength="8">
+                                <small class="form-text text-muted">Le mot de passe doit contenir au moins 8 caractères</small>
+                                <div class="invalid-feedback"></div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="register-password-confirm" class="form-label">
+                                    <i class="fas fa-lock me-1"></i>Confirmer le mot de passe
+                                </label>
+                                <input type="password" 
+                                       class="form-control" 
+                                       id="register-password-confirm" 
+                                       name="password_confirm" 
+                                       placeholder="Confirmez votre mot de passe" 
+                                       required>
+                                <div class="invalid-feedback"></div>
+                            </div>
+                            
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-success">
+                                    <i class="fas fa-user-plus me-2"></i>S'inscrire
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/js/auth.js"></script>
+<script>
+    // Gère le changement d'onglet et la validation
+    document.addEventListener('DOMContentLoaded', () => {
+        const loginForm = document.getElementById('loginForm');
+        const registerForm = document.getElementById('registerForm');
+        
+        // Validation des formulaires avec les IDs spécifiques
+        if (loginForm) {
+            loginForm.addEventListener('submit', (e) => {
+                const email = document.getElementById('login-email');
+                const password = document.getElementById('login-password');
+                let isValid = true;
+
+                // Validation email
+                if (!email.value || !isValidEmail(email.value)) {
+                    showError(email, 'Veuillez entrer une adresse email valide');
+                    isValid = false;
+                } else {
+                    clearError(email);
+                }
+
+                // Validation mot de passe
+                if (!password.value || password.value.length < 1) {
+                    showError(password, 'Le mot de passe est obligatoire');
+                    isValid = false;
+                } else {
+                    clearError(password);
+                }
+
+                if (!isValid) {
+                    e.preventDefault();
+                }
+            });
+        }
+        
+        if (registerForm) {
+            registerForm.addEventListener('submit', (e) => {
+                const name = document.getElementById('register-name');
+                const email = document.getElementById('register-email');
+                const password = document.getElementById('register-password');
+                const passwordConfirm = document.getElementById('register-password-confirm');
+                let isValid = true;
+
+                // Validation nom
+                if (!name.value || name.value.trim().length < 2) {
+                    showError(name, 'Le nom doit contenir au moins 2 caractères');
+                    isValid = false;
+                } else {
+                    clearError(name);
+                }
+
+                // Validation email
+                if (!email.value || !isValidEmail(email.value)) {
+                    showError(email, 'Veuillez entrer une adresse email valide');
+                    isValid = false;
+                } else {
+                    clearError(email);
+                }
+
+                // Validation mot de passe
+                if (!password.value || password.value.length < 8) {
+                    showError(password, 'Le mot de passe doit contenir au moins 8 caractères');
+                    isValid = false;
+                } else {
+                    clearError(password);
+                }
+
+                // Validation confirmation mot de passe
+                if (!passwordConfirm.value) {
+                    showError(passwordConfirm, 'Veuillez confirmer votre mot de passe');
+                    isValid = false;
+                } else if (password.value !== passwordConfirm.value) {
+                    showError(passwordConfirm, 'Les mots de passe ne correspondent pas');
+                    isValid = false;
+                } else {
+                    clearError(passwordConfirm);
+                }
+
+                if (!isValid) {
+                    e.preventDefault();
+                }
+            });
+            
+            // Validation en temps réel pour la confirmation de mot de passe
+            const passwordConfirm = document.getElementById('register-password-confirm');
+            const password = document.getElementById('register-password');
+            
+            if (passwordConfirm && password) {
+                passwordConfirm.addEventListener('input', () => {
+                    validatePasswordMatch(password, passwordConfirm);
+                });
+                
+                password.addEventListener('input', () => {
+                    validatePasswordMatch(password, passwordConfirm);
+                });
+            }
+        }
+        
+        // Active l'autofocus sur l'onglet actif
+        const activeTab = document.querySelector('.nav-link.active');
+        if (activeTab) {
+            const targetId = activeTab.getAttribute('data-bs-target');
+            const targetPane = document.querySelector(targetId);
+            if (targetPane) {
+                const firstInput = targetPane.querySelector('input[type="email"], input[type="text"]');
+                if (firstInput) {
+                    setTimeout(() => firstInput.focus(), 100);
+                }
+            }
+        }
+        
+        // Gère le changement d'onglet
+        const tabButtons = document.querySelectorAll('[data-bs-toggle="tab"]');
+        tabButtons.forEach(button => {
+            button.addEventListener('shown.bs.tab', (e) => {
+                const targetPane = document.querySelector(e.target.getAttribute('data-bs-target'));
+                if (targetPane) {
+                    const firstInput = targetPane.querySelector('input[type="email"], input[type="text"]');
+                    if (firstInput) {
+                        firstInput.focus();
+                    }
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}
+

@@ -5,6 +5,8 @@
 document.addEventListener('DOMContentLoaded', () => {
     const loginForm = document.getElementById('loginForm');
     const registerForm = document.getElementById('registerForm');
+    const forgotPasswordForm = document.getElementById('forgotPasswordForm');
+    const resetPasswordForm = document.getElementById('resetPasswordForm');
 
     if (loginForm) {
         loginForm.addEventListener('submit', validateLoginForm);
@@ -12,6 +14,28 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (registerForm) {
         registerForm.addEventListener('submit', validateRegisterForm);
+        
+        // Validation en temps réel pour la confirmation de mot de passe
+        const passwordConfirm = document.getElementById('password_confirm');
+        const password = document.getElementById('password');
+        
+        if (passwordConfirm && password) {
+            passwordConfirm.addEventListener('input', () => {
+                validatePasswordMatch(password, passwordConfirm);
+            });
+            
+            password.addEventListener('input', () => {
+                validatePasswordMatch(password, passwordConfirm);
+            });
+        }
+    }
+
+    if (forgotPasswordForm) {
+        forgotPasswordForm.addEventListener('submit', validateForgotPasswordForm);
+    }
+
+    if (resetPasswordForm) {
+        resetPasswordForm.addEventListener('submit', validateResetPasswordForm);
         
         // Validation en temps réel pour la confirmation de mot de passe
         const passwordConfirm = document.getElementById('password_confirm');
@@ -143,5 +167,56 @@ function showError(field, message) {
  */
 function clearError(field) {
     field.classList.remove('is-invalid');
+}
+
+/**
+ * Valide le formulaire de mot de passe oublié
+ */
+function validateForgotPasswordForm(e) {
+    const email = document.getElementById('email');
+    let isValid = true;
+
+    if (!email.value || !isValidEmail(email.value)) {
+        showError(email, 'Veuillez entrer une adresse email valide');
+        isValid = false;
+    } else {
+        clearError(email);
+    }
+
+    if (!isValid) {
+        e.preventDefault();
+    }
+}
+
+/**
+ * Valide le formulaire de réinitialisation de mot de passe
+ */
+function validateResetPasswordForm(e) {
+    const password = document.getElementById('password');
+    const passwordConfirm = document.getElementById('password_confirm');
+    let isValid = true;
+
+    // Validation mot de passe
+    if (!password.value || password.value.length < 8) {
+        showError(password, 'Le mot de passe doit contenir au moins 8 caractères');
+        isValid = false;
+    } else {
+        clearError(password);
+    }
+
+    // Validation confirmation mot de passe
+    if (!passwordConfirm.value) {
+        showError(passwordConfirm, 'Veuillez confirmer votre mot de passe');
+        isValid = false;
+    } else if (password.value !== passwordConfirm.value) {
+        showError(passwordConfirm, 'Les mots de passe ne correspondent pas');
+        isValid = false;
+    } else {
+        clearError(passwordConfirm);
+    }
+
+    if (!isValid) {
+        e.preventDefault();
+    }
 }
 
