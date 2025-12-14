@@ -8,7 +8,7 @@ body {
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
-    padding-top: 56px; /* Espace pour le menu fixe */
+    padding-top: 56px; /* Espace pour le menu fixe sur mobile */
 }
 
 /* Force le menu à rester au-dessus de tout */
@@ -34,13 +34,30 @@ body {
     border-radius: 5px;
 }
 
+/* Menu fixe sur toutes les tailles d'écran */
+.navbar.fixed-top {
+    position: fixed !important;
+    top: 0;
+    left: 0;
+    right: 0;
+}
+
+/* Padding pour le contenu principal (évite que le contenu soit caché sous le menu) */
+main.container-fluid,
+.container-fluid.mt-5,
+.page {
+    padding-top: 60px !important;
+}
+
 @media (min-width: 992px) {
+    /* Garde le padding même sur desktop pour le menu fixe */
     body {
-        padding-top: 0; /* Pas de padding en desktop si le menu n'est pas fixed */
+        padding-top: 56px;
     }
     
-    .navbar {
-        position: relative !important; /* Menu non fixe en desktop */
+    main.container-fluid,
+    .container-fluid.mt-5 {
+        padding-top: 20px !important;
     }
 }
 
